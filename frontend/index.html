@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemoVault | Premium Knowledge Workspace</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Particle Background Canvas -->
+    <canvas id="particles" class="particle-background"></canvas>
+
+    <!-- Interactive Cursor Glow -->
+    <div id="cursorGlow" class="cursor-glow"></div>
+
+    <div class="app-layout">
+        
+        <!-- ================= SIDEBAR ================= -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-logo">
+                    <svg class="icon-logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>MemoVault</span>
+                </div>
+                <div class="brand-tagline">Second Brain System</div>
+            </div>
+
+            <!-- Stats Module -->
+            <div class="stats-panel">
+                <div class="stat-item">
+                    <span class="stat-value" id="totalNotesCount">0</span>
+                    <span class="stat-label">Total Notes</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="pinnedNotesCount">0</span>
+                    <span class="stat-label">Pinned</span>
+                </div>
+            </div>
+
+            <!-- Navigation / Filters -->
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Navigation</div>
+                <button class="nav-btn active" id="filterAllBtn">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="3" width="7" height="9" rx="1" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <rect x="14" y="3" width="7" height="5" rx="1" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <rect x="14" y="12" width="7" height="9" rx="1" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <rect x="3" y="16" width="7" height="5" rx="1" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                    </svg>
+                    <span>All Memories</span>
+                </button>
+                <button class="nav-btn" id="filterPinnedBtn">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2V22M12 2L19 9H12M12 2L5 9H12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pin-icon-path"/>
+                        <path d="M12 17L19 10M12 17L5 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Pinned Only</span>
+                </button>
+
+                <div class="nav-section-title">Filter by Tags</div>
+                <div class="tags-container" id="tagsFilterContainer">
+                    <!-- Dynamic tag filters will be generated here -->
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <span class="designer">@karthikeya saran</span>
+            </div>
+        </aside>
+
+        <!-- ================= MAIN CONTENT ================= -->
+        <main class="main-content">
+            
+            <!-- Top Actions & Search -->
+            <header class="app-header">
+                <div class="search-bar">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Search memories, tags, titles...">
+                </div>
+                <button class="primary-btn" id="toggleComposerBtn">
+                    <svg class="btn-icon-plus" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>New Note</span>
+                </button>
+            </header>
+
+            <!-- Workspace Section -->
+            <div class="workspace-area">
+                
+                <!-- Expanded Note Composer (Initially hidden / collapsed toggle) -->
+                <section class="composer-card collapsed" id="noteComposer">
+                    <div class="composer-header">
+                        <h3 id="composerTitleText">Capture a New Memory</h3>
+                        <button class="close-composer-btn" id="cancelBtn" title="Collapse">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="composer-body">
+                        <div class="input-group">
+                            <input type="text" id="noteTitleInput" placeholder="Give your note a title..." autocomplete="off">
+                        </div>
+                        <div class="input-group">
+                            <textarea id="noteContentInput" placeholder="Start typing your ideas, thoughts, or codes here..." rows="4"></textarea>
+                        </div>
+                        <div class="input-group-row">
+                            <!-- Tags Input -->
+                            <div class="tags-input-wrapper">
+                                <label for="noteTagsInput">Tags (comma separated)</label>
+                                <input type="text" id="noteTagsInput" placeholder="e.g. work, ideas, learning" autocomplete="off">
+                            </div>
+                            
+                            <!-- Theme Palette Selection -->
+                            <div class="theme-selection-wrapper">
+                                <label>Color Accent</label>
+                                <div class="theme-palette" id="themePalette">
+                                    <button type="button" class="color-dot active" data-color="theme-violet" style="background: linear-gradient(135deg, #a78bfa, #7c3aed);" title="Violet Dream"></button>
+                                    <button type="button" class="color-dot" data-color="theme-emerald" style="background: linear-gradient(135deg, #34d399, #059669);" title="Emerald Aurora"></button>
+                                    <button type="button" class="color-dot" data-color="theme-ocean" style="background: linear-gradient(135deg, #60a5fa, #2563eb);" title="Ocean Breeze"></button>
+                                    <button type="button" class="color-dot" data-color="theme-coral" style="background: linear-gradient(135deg, #f87171, #dc2626);" title="Sunset Coral"></button>
+                                    <button type="button" class="color-dot" data-color="theme-amber" style="background: linear-gradient(135deg, #fbbf24, #d97706);" title="Warm Amber"></button>
+                                    <button type="button" class="color-dot" data-color="theme-obsidian" style="background: linear-gradient(135deg, #6b7280, #374151);" title="Obsidian"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="composer-footer">
+                        <button class="secondary-btn" id="clearComposerBtn">Clear</button>
+                        <button class="save-btn" id="saveBtn">Save Memory</button>
+                    </div>
+                </section>
+
+                <!-- Pinned Notes Section (shows if pinned exist) -->
+                <section class="notes-section" id="pinnedSection" style="display: none;">
+                    <div class="section-divider">
+                        <svg class="section-divider-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2V22M12 2L19 9H12M12 2L5 9H12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <h4>PINNED MEMORIES</h4>
+                    </div>
+                    <div class="notes-grid" id="pinnedNotesGrid">
+                        <!-- Pinned cards loaded dynamically -->
+                    </div>
+                </section>
+
+                <!-- All Notes Section -->
+                <section class="notes-section">
+                    <div class="section-divider" id="notesSectionDivider">
+                        <svg class="section-divider-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <path d="M9 17H15M9 12H15M9 7H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <h4 id="notesGridTitle">ALL MEMORIES</h4>
+                    </div>
+
+                    <!-- Loading State Spinner -->
+                    <div class="loading-state" id="loadingState">
+                        <div class="spinner"></div>
+                        <p>Syncing with Vault...</p>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div class="empty-state" id="emptyState" style="display: none;">
+                        <div class="empty-icon">✦</div>
+                        <h3>Your Vault is Empty</h3>
+                        <p>Create a note to start cataloging your thoughts and inspirations.</p>
+                        <button class="primary-btn mt-4" id="emptyStateCreateBtn">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; margin-right: 8px;">
+                                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Create First Note
+                        </button>
+                    </div>
+
+                    <!-- Notes Grid -->
+                    <div class="notes-grid" id="notesGrid">
+                        <!-- Note cards loaded dynamically -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Note Detail Modal Overlay -->
+    <div id="noteModal" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <span id="modalPinIndicator" class="modal-pin-tag">✦ Pinned</span>
+                <button class="close-modal-btn" id="closeModalBtn" title="Close Modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h2 id="modalNoteTitle" class="modal-title">Note Title</h2>
+                <div id="modalNoteContent" class="modal-content-body">Note Content</div>
+                <div id="modalNoteTags" class="modal-tags"></div>
+            </div>
+            <div class="modal-footer">
+                <span id="modalNoteDate" class="modal-date">Date</span>
+                <div class="modal-actions">
+                    <button id="modalEditBtn" class="modal-btn edit" title="Edit Note">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:14px; height:14px; margin-right:6px;">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Edit
+                    </button>
+                    <button id="modalDeleteBtn" class="modal-btn delete" title="Delete Note">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:14px; height:14px; margin-right:6px;">
+                            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Message -->
+    <div id="toast" class="toast">
+        <span class="toast-message" id="toastMessage">Memory Saved Successfully</span>
+    </div>
+
+    <!-- Script -->
+    <script src="script.js"></script>
+</body>
+</html>
